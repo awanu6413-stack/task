@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevPro | Advanced Web Studio</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <style>
+        /* 1. Global Variables & Theme Support */
+        :root {
+            --primary: #0d6efd;
+            --primary-hover: #0a58ca;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #334155;
+            --text-title: #0f172a;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --border-color: #e2e8f0;
+            --transition-speed: 0.4s;
+            --transition-curve: cubic-bezier(0.4, 0, 0.2, 1);
+            --overlay: rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #94a3b8;
+            --text-title: #f1f5f9;
+            --nav-bg: rgba(15, 23, 42, 0.95);
+            --border-color: #334155;
+            --overlay: rgba(0, 0, 0, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            color: var(--text-main);
+            background-color: var(--bg-body);
+            overflow-x: hidden;
+            /* Smooth transition for theme switching */
+            transition: background-color var(--transition-speed) var(--transition-curve), 
+                        color var(--transition-speed) var(--transition-curve);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        section { padding: 100px 0; }
+
+        .section-title h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            color: var(--text-title);
+            margin-bottom: 15px;
+            transition: color var(--transition-speed);
+        }
+
+        .underline {
+            width: 80px; height: 5px;
+            background: linear-gradient(to right, var(--primary), #38bdf8);
+            margin: 0 auto 60px; border-radius: 10px;
+        }
+
+        /* 2. Navigation */
+        .navbar {
+            padding: 1.2rem 0;
+            position: fixed;
+            width: 100%; top: 0; z-index: 1000;
+            transition: all var(--transition-speed) var(--transition-curve);
+        }
+
+        .navbar.scrolled {
+            background: var(--nav-bg);
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 0;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-content {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo {
+            font-size: 1.6rem; font-weight: 700; text-decoration: none;
+            color: var(--text-title); letter-spacing: -1px;
+            z-index: 1001;
+            transition: color var(--transition-speed);
+        }
+
+        .logo span { color: var(--primary); }
+
+        .nav-links {
+            display: flex; align-items: center; list-style: none; gap: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none; color: var(--text-title);
+            font-weight: 600; transition: color var(--transition-speed);
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .theme-toggle {
+            cursor: pointer; font-size: 1.2rem; color: var(--text-title);
+            transition: transform 0.3s ease, color var(--transition-speed);
+            width: 30px; text-align: center;
+        }
+        
+        .theme-toggle:hover { transform: rotate(15deg); }
+
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-title);
+            z-index: 1001;
+        }
+
+        /* 3. Hero Section */
+        .hero {
+            height: 100vh;
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.6)),
+                        url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; background-position: center;
+            display: flex; align-items: center; color: white;
+        }
+
+        .hero-content h1 { font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 20px; color: white; }
+        .hero-content p { font-size: 1.2rem; max-width: 600px; margin-bottom: 40px; color: #cbd5e1; }
+
+        .btn {
+            padding: 16px 35px; border-radius: 8px; text-decoration: none;
+            font-weight: 600; display: inline-block; transition: all 0.3s ease;
+            cursor: pointer; border: none;
+        }
+
+        .btn-filled { background: var(--primary); color: white; margin-right: 15px; }
+        .btn-outline { border: 2px solid white; color: white; }
+        .btn-filled:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(13, 110, 253, 0.4); }
+
+        /* 4. Portfolio */
+        .portfolio-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;
+        }
+
+        .portfolio-item {
+            position: relative; border-radius: 15px; overflow: hidden; height: 300px;
+            cursor: pointer; background: var(--bg-card);
+        }
+
+        .portfolio-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+
+        .portfolio-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 110, 253, 0.85); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: white;
+            opacity: 0; transition: opacity 0.4s ease; padding: 20px; text-align: center;
+        }
+
+        .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+        .portfolio-item:hover img { transform: scale(1.1); }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000;
+            display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.4s ease;
+        }
+        .lightbox.active { display: flex; opacity: 1; }
+        .lightbox img { max-width: 90%; max-height: 80vh; border-radius: 10px; transform: scale(0.8); transition: 0.4s; }
+        .lightbox.active img { transform: scale(1); }
+        .close-lightbox { position: absolute; top: 30px; right: 40px; color: white; font-size: 2rem; cursor: pointer; }
+
+        /* 5. Pricing Section */
+        .pricing-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;
+        }
+
+        .price-card {
+            background: var(--bg-card); padding: 40px; border-radius: 20px;
+            border: 1px solid var(--border-color); text-align: center;
+            /* Smooth background/border transition */
+            transition: transform 0.3s ease, background-color var(--transition-speed), border-color var(--transition-speed), box-shadow 0.3s ease;
+        }
+
+        .price-card.popular { border: 2px solid var(--primary); transform: scale(1.05); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .price-card h3 { font-size: 1.5rem; color: var(--text-title); margin-bottom: 10px; transition: color var(--transition-speed); }
+        .price-card .amount { font-size: 3rem; font-weight: 700; color: var(--primary); }
+        .price-card ul { list-style: none; margin: 30px 0; }
+        .price-card li { margin-bottom: 15px; font-size: 0.95rem; color: var(--text-main); transition: color var(--transition-speed); }
+
+        /* 6. Contact Section */
+        .contact { background: #0f172a; color: white; }
+        .contact-form { 
+            background: rgba(255,255,255,0.05); padding: 40px; border-radius: 15px;
+            backdrop-filter: blur(10px); max-width: 700px; margin: 0 auto;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 15px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2); background: transparent; color: white;
+            font-family: inherit;
+        }
+
+        /* 7. Footer */
+        footer {
+            padding: 40px 0; text-align: center; 
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-body);
+            color: var(--text-main);
+            transition: background-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        /* 8. Mobile Navigation */
+        @media (max-width: 768px) {
+            .hamburger { display: block; }
+
+            .nav-links {
+                position: fixed; top: 0; right: -100%; height: 100vh; width: 80%;
+                background: var(--bg-card); flex-direction: column; justify-content: center;
+                transition: 0.5s cubic-bezier(0.77,0.2,0.05,1.0); 
+                box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+                z-index: 1000;
+            }
+
+            .nav-links.active { right: 0; }
+            .nav-links li { margin: 20px 0; }
+            
+            .nav-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: var(--overlay); visibility: hidden; opacity: 0;
+                transition: 0.4s; z-index: 999;
+            }
+            .nav-overlay.active { visibility: visible; opacity: 1; }
+            .price-card.popular { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="nav-overlay" id="nav-overlay"></div>
+
+    <nav class="navbar" id="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo">DEV<span>PRO</span></a>
+            
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#work">Portfolio</a></li>
+                <li><a href="#pricing">Pricing</a></li>
+                <li><a href="#contact" class="btn btn-filled" style="padding: 10px 25px; margin: 0;">Hire Us</a></li>
+                <li class="theme-toggle" id="theme-toggle"><i class="fa-solid fa-moon"></i></li>
+            </ul>
+
+            <div class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <div class="lightbox" id="lightbox">
+        <span class="close-lightbox">&times;</span>
+        <img src="" alt="Full View" id="lightbox-img">
+    </div>
+
+    <header id="home" class="hero">
+        <div class="container" data-aos="fade-up">
+            <div class="hero-content">
+                <h1>Crafting Digital <span style="color:var(--primary)">Masterpieces</span></h1>
+                <p>We build award-winning websites that combine stunning aesthetics with industry-leading performance.</p>
+                <div class="btn-group">
+                    <a href="#work" class="btn btn-filled">View Projects</a>
+                    <a href="#contact" class="btn btn-outline">Free Consultation</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="work">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Our Recent Work</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-item" data-aos="zoom-in" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" alt="E-Commerce Pro">
+                    <div class="portfolio-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <h3>E-Commerce Pro</h3>
+                        <p>Click to expand</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="100" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="SaaS Dashboard">
+                    <div class="portfolio-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <h3>SaaS Dashboard</h3>
+                        <p>Click to expand</p>
+                    </div>
+                </div>
+                <div class="portfolio-item" data-aos="zoom-in" data-aos-delay="200" onclick="openLightbox(this)">
+                    <img src="https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=800&q=80" alt="Brand Identity">
+                    <div class="portfolio-overlay">
+                        <i class="fa-solid fa-magnifying-glass-plus" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <h3>Brand Identity</h3>
+                        <p>Click to expand</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pricing">
+        <div class="container">
+            <div class="section-title" data-aos="fade-up">
+                <h2>Pricing Plans</h2>
+                <div class="underline"></div>
+            </div>
+            <div class="pricing-grid">
+                <div class="price-card" data-aos="fade-up">
+                    <h3>Starter</h3>
+                    <div class="amount">$999</div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> 5 Pages Design</li>
+                        <li><i class="fa-solid fa-check"></i> Mobile Responsive</li>
+                        <li><i class="fa-solid fa-check"></i> Basic SEO Setup</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary);">Choose Starter</a>
+                </div>
+                <div class="price-card popular" data-aos="fade-up" data-aos-delay="100">
+                    <div style="background: var(--primary); color: white; border-radius: 20px; padding: 5px; margin-bottom: 10px; font-size: 0.8rem; font-weight: bold;">MOST POPULAR</div>
+                    <h3>Professional</h3>
+                    <div class="amount">$2,499</div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> 15 Pages Design</li>
+                        <li><i class="fa-solid fa-check"></i> Custom Animations</li>
+                        <li><i class="fa-solid fa-check"></i> CMS Integration</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-filled">Choose Pro</a>
+                </div>
+                <div class="price-card" data-aos="fade-up" data-aos-delay="200">
+                    <h3>Enterprise</h3>
+                    <div class="amount">$4,999</div>
+                    <ul>
+                        <li><i class="fa-solid fa-check"></i> Unlimited Pages</li>
+                        <li><i class="fa-solid fa-check"></i> API Integrations</li>
+                        <li><i class="fa-solid fa-check"></i> 1 Year Support</li>
+                    </ul>
+                    <a href="#contact" class="btn btn-outline" style="border-color: var(--primary); color: var(--primary);">Contact Sales</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2 style="color: white;">Let's Work Together</h2>
+            </div>
+            <div class="contact-form" data-aos="fade-up">
+                <form id="contactForm">
+                    <div class="form-group"><input type="text" placeholder="Your Name" required></div>
+                    <div class="form-group"><input type="email" placeholder="Email Address" required></div>
+                    <div class="form-group"><textarea rows="5" placeholder="Project Details"></textarea></div>
+                    <button type="submit" class="btn btn-filled" style="width: 100%;">Launch Project</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 DevPro Web Studio. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({ duration: 800, once: true });
+
+        // Navbar Logic
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Mobile Menu Logic
+        const hamburger = document.getElementById('hamburger');
+        const navLinks = document.getElementById('nav-links');
+        const navOverlay = document.getElementById('nav-overlay');
+        const hamIcon = hamburger.querySelector('i');
+
+        const toggleMenu = () => {
+            navLinks.classList.toggle('active');
+            navOverlay.classList.toggle('active');
+            hamIcon.classList.toggle('fa-bars');
+            hamIcon.classList.toggle('fa-xmark');
+            document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : 'initial';
+        };
+
+        hamburger.addEventListener('click', toggleMenu);
+        navOverlay.addEventListener('click', toggleMenu);
+
+        // --- THEME SWITCHING ENGINE ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+
+        const applyTheme = (theme) => {
+            body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            // Handle Icon Swap
+            if (theme === 'dark') {
+                themeIcon.className = 'fa-solid fa-sun';
+            } else {
+                themeIcon.className = 'fa-solid fa-moon';
+            }
+        };
+
+        themeToggle.addEventListener('click', () => {
+            const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+
+        // Check local storage on initial load
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+        // Lightbox Utility
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        
+        function openLightbox(element) {
+            lightboxImg.src = element.querySelector('img').src;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        lightbox.addEventListener('click', (e) => {
+            if(e.target !== lightboxImg) {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = 'initial';
+            }
+        });
+    </script>
+</body>
+</html>

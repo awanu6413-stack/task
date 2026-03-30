@@ -1,0 +1,133 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Discount Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .t {
+             color: #000000;
+             background: linear-gradient(30deg, red, blue, green, yellow);
+             border: 2px solid black;
+             padding: 10px;
+             margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 5px;
+            box-shadow: 0 4px #1e7e34;
+        }
+
+        button:active {
+            box-shadow: 0 2px #1e7e34;
+            transform: translateY(2px);
+        }
+
+        .result-table {
+            margin: 30px auto;
+            border-collapse: collapse;
+            width: 80%;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #333;
+            color: white;
+        }
+
+        tr:nth-child(even) { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+  
+
+
+    <div id="displayArea">
+        </div>
+</div>
+
+<script>
+// Automatically run on page load
+window.onload = calculateDiscount;
+
+function calculateDiscount() {
+    // Take input via Prompt
+    let input = prompt("Please enter the item amount:");
+    
+    // Validate if user cancelled or entered nothing
+    if (input === null || input === "") return;
+
+    let amount = Number(input);
+    let discountPercent = 0;
+
+    // Logic
+     if (amount >= 30000) {
+        discountPercent = 15;
+    }
+    else if (amount >= 10000) {
+        discountPercent = 10;
+    } else if (amount >= 5000) {
+        discountPercent = 5;
+    } else if (amount >= 3000) {
+        discountPercent = 3;
+    }
+
+    let discountAmount = (amount * discountPercent) / 100;
+    let finalPrice = amount - discountAmount;
+
+    // Building the Table output
+    let tableHTML = `
+        <table class="result-table">
+            <thead>
+                <tr>
+                    <th>ITEMS</th>
+                    <th>PRICE</th>
+                    <th>DISCOUNT</th>
+                    <th>FINAL PRICE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Item 1</td>
+                    <td>$${amount.toFixed(2)}</td>
+                    <td>${discountPercent}%</td>
+                    <td><strong>$${finalPrice.toFixed(2)}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById("displayArea").innerHTML = tableHTML;
+}
+</script>
+
+</body>
+</html>
+
+
+
+</body>
+</html>

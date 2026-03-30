@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Persistent Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --secondary: #6366f1;
+            --dark: #1e293b;
+            --slate: #64748b;
+            --white: #ffffff;
+            --bg: #f1f5f9;
+        }
+
+        * { box-sizing: border-box; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background: var(--white);
+            width: 100%;
+            max-width: 900px;
+            padding: 45px;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+            margin: auto;
+        }
+
+        .header-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-left: 6px solid var(--primary);
+            padding-left: 20px;
+        }
+
+        .header-text h1 { margin: 0; font-size: 1.8rem; letter-spacing: -0.03em; }
+        .header-text p { margin: 4px 0 0; color: var(--slate); font-size: 0.95rem; }
+
+        .status-tag {
+            font-size: 0.65rem;
+            background: #ecfdf5;
+            color: var(--primary-dark);
+            padding: 6px 14px;
+            border-radius: 99px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            border: 1px solid #d1fae5;
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+
+        button {
+            flex: 1;
+            min-width: 160px;
+            padding: 15px 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-add { background: var(--dark); color: white; }
+        .btn-add:hover { background: #000; transform: translateY(-3px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.2); }
+
+        .btn-print { background: var(--primary); color: white; }
+        .btn-print:hover { background: var(--primary-dark); transform: translateY(-3px); }
+
+        .btn-clear { background: #f8fafc; color: #ef4444; border: 1px solid #fee2e2; }
+        .btn-clear:hover { background: #fee2e2; }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 20px;
+            border: 1px solid #f1f5f9;
+            background: #fff;
+        }
+
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+
+        th {
+            background: #f8fafc;
+            padding: 18px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--slate);
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        td { padding: 18px; border-bottom: 1px solid #f8fafc; font-size: 1rem; }
+
+        .discount-badge {
+            background: #dcfce7;
+            color: #166534;
+            padding: 5px 12px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 0.8rem;
+        }
+
+        /* Footer Card */
+        .summary-card {
+            margin-top: 35px;
+            background: var(--dark);
+            color: white;
+            padding: 28px 35px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::after {
+            content: '';
+            position: absolute;
+            top: -50%; right: -10%;
+            width: 200px; height: 200px;
+            background: var(--primary);
+            filter: blur(80px);
+            opacity: 0.2;
+        }
+
+        .total-label { text-transform: uppercase; font-size: 0.8rem; letter-spacing: 2px; opacity: 0.6; display: block; margin-bottom: 4px; }
+        .total-price { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin: 0; }
+
+        /* Print Settings */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; width: 100%; padding: 0; }
+            .controls, .status-tag { display: none !important; }
+            .summary-card { background: white !important; color: black !important; border: 2px solid var(--dark); }
+            .total-price { color: black !important; }
+        }
+
+        @media (max-width: 650px) {
+            .container { padding: 25px; border-radius: 0; }
+            .summary-card { flex-direction: column; text-align: center; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-box">
+        <div class="header-text">
+            <h1>Purchase Insight</h1>
+            <p id="dateDisplay"></p>
+        </div>
+        <div class="status-tag">STORAGE SYNCED</div>
+    </div>
+
+    <div class="controls">
+        <button class="btn-add" onclick="addItem()">+ Add Entry</button>
+        <button class="btn-print" onclick="window.print()">Export Report</button>
+        <button class="btn-clear" onclick="clearHistory()">Reset Session</button>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Ref ID</th>
+                    <th>Original Cost</th>
+                    <th>Savings</th>
+                    <th>Net Amount</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+        </table>
+    </div>
+    
+    <div id="empty-msg" style="padding: 60px; color: var(--slate); text-align: center; display: none;">
+        <p>No active records. Click "Add Entry" to begin your report.</p>
+    </div>
+
+    <div class="summary-card" id="totalCard" style="display: none;">
+        <div>
+            <span class="total-label">Grand Total Payable</span>
+            <span style="font-size: 0.9rem; opacity: 0.8;">Automated Discount Applied</span>
+        </div>
+        <h2 id="grandTotal" class="total-price">$0.00</h2>
+    </div>
+</div>
+
+<script>
+    // Load data from LocalStorage immediately
+    let entries = JSON.parse(localStorage.getItem('discountData')) || [];
+    document.getElementById("dateDisplay").innerText = "Report Data: " + new Date().toLocaleDateString();
+
+    window.onload = renderTable;
+
+    function addItem() {
+        const input = prompt("Enter purchase amount:");
+        if (input === null) return;
+
+        const price = parseFloat(input);
+        if (isNaN(price) || price <= 0) {
+            alert("Please enter a valid numeric amount.");
+            return;
+        }
+
+        // Tier Logic
+        let disc = price >= 10000 ? 50 : price >= 5000 ? 25 : price >= 3000 ? 10 : 0;
+        let final = price - (price * disc / 100);
+
+        const newEntry = {
+            original: price,
+            discount: disc,
+            final: final
+        };
+
+        entries.push(newEntry);
+        syncStorage();
+    }
+
+    function syncStorage() {
+        localStorage.setItem('discountData', JSON.stringify(entries));
+        renderTable();
+    }
+
+    function renderTable() {
+        const body = document.getElementById("historyBody");
+        const card = document.getElementById("totalCard");
+        const empty = document.getElementById("empty-msg");
+        
+        body.innerHTML = "";
+
+        if (entries.length === 0) {
+            card.style.display = "none";
+            empty.style.display = "block";
+            return;
+        }
+
+        card.style.display = "flex";
+        empty.style.display = "none";
+        
+        let totalSum = 0;
+
+        entries.forEach((item, index) => {
+            totalSum += item.final;
+            const row = body.insertRow();
+            row.innerHTML = `
+                <td style="font-weight: 600; color: var(--slate);">#TR-00${index + 1}</td>
+                <td>$${item.original.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                <td><span class="discount-badge">-${item.discount}%</span></td>
+                <td style="font-weight: 800; color: var(--dark);">$${item.final.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            `;
+        });
+
+        document.getElementById("grandTotal").innerText = "$" + totalSum.toLocaleString(undefined, {minimumFractionDigits: 2});
+    }
+
+    function clearHistory() {
+        if (confirm("This will permanently delete all saved entries. Proceed?")) {
+            entries = [];
+            syncStorage();
+        }
+    }
+</script>
+
+</body>
+</html>
