@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --quiz-green: #008069;
+            --quiz-red: #ea0038;
+            --quiz-bg: #e5ddd5;
+            --quiz-blue: #027eb5;
+        }
+
+        body { background-color: var(--quiz-bg); font-family: 'Segoe UI', sans-serif; margin: 0; padding-top: 80px; }
+
+        .score-board {
+            position: fixed; top: 0; width: 100%; background: #008069; color: white;
+            display: flex; justify-content: space-around; padding: 12px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 1000; font-weight: bold;
+        }
+
+        .quiz-container { display: flex; flex-direction: column; align-items: center; padding: 20px; }
+
+        .quiz-card {
+            background: white; padding: 20px; border-radius: 15px; width: 100%; max-width: 350px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); position: relative; display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .active-card { display: block; }
+
+        .timer-badge {
+            position: absolute; top: 15px; right: 15px; width: 35px; height: 35px;
+            border: 3px solid #eee; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; font-size: 12px; font-weight: bold;
+        }
+
+        .quiz-question { font-size: 16px; font-weight: 600; margin-bottom: 20px; color: #111b21; }
+        .quiz-option { display: flex; align-items: flex-start; padding: 12px 10px; cursor: pointer; border-radius: 8px; margin-bottom: 5px; }
+        
+        .quiz-radio-circle {
+            min-width: 20px; height: 20px; border: 2px solid #adb5bd; border-radius: 50%;
+            margin-right: 12px; margin-top: 2px; display: flex; align-items: center; justify-content: center;
+        }
+
+        .quiz-option-content { flex-grow: 1; }
+        .quiz-percentage { font-size: 13px; font-weight: 700; opacity: 0; float: right; }
+        .quiz-progress-bg { width: 100%; height: 8px; background: #f0f2f5; border-radius: 10px; visibility: hidden; margin-top: 5px; overflow: hidden; }
+        .quiz-progress-fill { height: 100%; width: 0%; background: #cbd5e0; transition: width 0.8s ease; }
+
+        /* Voted Logic */
+        .voted .quiz-percentage { opacity: 1; }
+        .voted .quiz-progress-bg { visibility: visible; }
+        .is-correct .quiz-progress-fill { background-color: var(--quiz-green) !important; }
+        .is-correct .quiz-percentage { color: var(--quiz-green); }
+        .selected.is-wrong .quiz-radio-circle { background: var(--quiz-red); border-color: var(--quiz-red); }
+        .is-correct.selected .quiz-radio-circle { background: var(--quiz-green); border-color: var(--quiz-green); }
+        .selected .quiz-radio-circle::after { content: ""; width: 8px; height: 8px; background: white; border-radius: 50%; }
+
+        .next-btn {
+            margin-top: 20px; padding: 12px 30px; background: var(--quiz-blue); color: white;
+            border: none; border-radius: 25px; font-weight: bold; cursor: pointer; display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="score-board">
+    <span>Score: <span id="total-score">0</span></span>
+    <span>🔥 Streak: <span id="streak-count">0</span></span>
+</div>
+
+<div class="quiz-container" id="quiz-app">
+    </div>
+<center><button id="next-btn" class="next-btn" onclick="loadNextQuestion()">Next Question ➔</button></center>
+
+<script>
+// 1. ADD YOUR QUESTIONS HERE
+const myQuestions = [
+    {
+        q: "Aeroplane coming toward airport its apparent frequency_______?",
+        options: ["Increase", "Decrease", "Remain Same"],
+        correct: 0,
+        votes: [142, 24, 12]
+    },
+    {
+        q: "Light year is a unit of which physical quantity?",
+        options: ["Time", "Distance", "Intensity"],
+        correct: 1,
+        votes: [45, 180, 15]
+    },
+    {
+        q: "Which of the following is a scalar quantity?",
+        options: ["Velocity", "Force", "Work"],
+        correct: 2,
+        votes: [30, 20, 95]
+    }
+];
+
+let currentIdx = 0;
+let totalScore = 0;
+let streak = 0;
+let timerInterval;
+
+function initQuiz() {
+    const container = document.getElementById('quiz-app');
+    myQuestions.forEach((data, i) => {
+        const card = document.createElement('div');
+        card.className = `quiz-card ${i === 0 ? 'active-card' : ''}`;
+        card.id = `q-${i}`;
+        
+        card.innerHTML = `
+            <div class="timer-badge" id="timer-${i}">15</div>
+            <p class="quiz-question">${data.q}</p>
+            <div class="poll-box">
+                ${data.options.map((opt, optIdx) => `
+                    <div class="quiz-option" onclick="handleVote(${i}, ${optIdx})">
+                        <div class="quiz-radio-circle"></div>
+                        <div class="quiz-option-content">
+                            <span>${opt}</span>
+                            <span class="quiz-percentage">0%</span>
+                            <div class="quiz-progress-bg"><div class="quiz-progress-fill"></div></div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+    startTimer(0);
+}
+
+function startTimer(idx) {
+    let time = 15;
+    const timerDisplay = document.getElementById(`timer-${idx}`);
+    timerInterval = setInterval(() => {
+        time--;
+        timerDisplay.innerText = time;
+        if(time <= 0) {
+            clearInterval(timerInterval);
+            handleVote(idx, -1); // Auto-reveal
+        }
+    }, 1000);
+}
+
+function handleVote(qIdx, selectedIdx) {
+    clearInterval(timerInterval);
+    const card = document.getElementById(`q-${qIdx}`);
+    if (card.classList.contains('voted')) return;
+    
+    card.classList.add('voted');
+    const questionData = myQuestions[qIdx];
+    const options = card.querySelectorAll('.quiz-option');
+    
+    if (selectedIdx === questionData.correct) {
+        totalScore++; streak++;
+        if(streak % 5 === 0) confetti({ particleCount: 150, spread: 70 });
+    } else {
+        streak = 0;
+        if(selectedIdx !== -1) options[selectedIdx].classList.add('selected', 'is-wrong');
+    }
+
+    if(selectedIdx !== -1) options[selectedIdx].classList.add('selected');
+    options[questionData.correct].classList.add('is-correct');
+
+    // Update Stats
+    let currentVotes = [...questionData.votes];
+    if(selectedIdx !== -1) currentVotes[selectedIdx]++;
+    const total = currentVotes.reduce((a, b) => a + b, 0);
+
+    options.forEach((opt, i) => {
+        const pc = Math.round((currentVotes[i] / total) * 100);
+        opt.querySelector('.quiz-percentage').innerText = pc + "%";
+        setTimeout(() => opt.querySelector('.quiz-progress-fill').style.width = pc + "%", 50);
+    });
+
+    document.getElementById('total-score').innerText = totalScore;
+    document.getElementById('streak-count').innerText = streak;
+    document.getElementById('next-btn').style.display = 'block';
+}
+
+function loadNextQuestion() {
+    document.getElementById(`q-${currentIdx}`).classList.remove('active-card');
+    currentIdx++;
+    if(currentIdx < myQuestions.length) {
+        document.getElementById(`q-${currentIdx}`).classList.add('active-card');
+        document.getElementById('next-btn').style.display = 'none';
+        startTimer(currentIdx);
+    } else {
+        document.getElementById('quiz-app').innerHTML = "<h2>Quiz Finished! Check your final score above.</h2>";
+        document.getElementById('next-btn').style.display = 'none';
+    }
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>

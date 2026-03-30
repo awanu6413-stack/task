@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Responsive Gemini Layout</title>
+<link rel="stylesheet" href="NAV.CSS">
+<style>
+    :root {
+    --sidebar-width: 280px;
+    --nav-height: 70px; /* Height for the top bar on PC */
+    --sidebar-bg: #1e1e1e;
+    --main-bg: #131314;
+    --text-color: #e3e3e3;
+    --hover-color: #333333;
+    --accent-blue: #4b90ff;
+}
+
+body {
+    margin: 0; font-family: 'Inter', sans-serif;
+    background-color: var(--main-bg); color: var(--text-color);
+    display: flex; height: 100vh; flex-direction: column;
+}
+
+/* --- NAVIGATION ELEMENT --- */
+.navigation {
+    background-color: var(--sidebar-bg);
+    border-bottom: 1px solid #333;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+.nav-links { display: flex; padding: 10px; }
+
+.nav-item {
+    padding: 12px 15px; margin: 5px; border-radius: 8px;
+    cursor: pointer; transition: 0.2s;
+    display: flex; align-items: center; gap: 10px;
+}
+.nav-item:hover { background-color: var(--hover-color); }
+
+/* --- SUB-MENU STYLING --- */
+.sub-menu {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: #252526; border-radius: 8px;
+}
+.sub-menu.open { max-height: 200px; padding: 5px 0; }
+.sub-item { padding: 10px 20px; font-size: 0.9rem; color: #aaa; cursor: pointer; }
+.sub-item:hover { color: var(--accent-blue); }
+.arrow { font-size: 12px; transition: 0.3s; }
+.rotate { transform: rotate(180deg); }
+
+/* 🖥️ DESKTOP VIEW (TOP BAR) */
+@media (min-width: 993px) {
+    .navigation {
+        width: 100%; height: var(--nav-height);
+        position: fixed; top: 0; left: 0;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 40px; box-sizing: border-box;
+    }
+    .nav-links { flex-direction: row; }
+    .main-container { margin-top: var(--nav-height); margin-left: 0; }
+    .top-nav-mobile { display: none; } /* Hide mobile hamburger bar */
+    /* Ensure submenus don't push the whole bar down on PC */
+    .menu-wrapper { position: relative; }
+    .sub-menu { position: absolute; top: 55px; width: 180px; box-shadow: 0 8px 16px rgba(0,0,0,0.5); }
+}
+/* 📱 TABLET/MOBILE VIEW (SIDEBAR) */
+@media (max-width: 992px) {
+    .navigation {
+        width: var(--sidebar-width); height: 100%;
+        position: fixed; left: 0; top: 0;
+        transform: translateX(-100%); /* Hidden */
+        flex-direction: column; border-right: 1px solid #333;
+    }
+    .navigation.active { transform: translateX(0); }
+    .nav-links { flex-direction: column; }
+    .top-nav-mobile {
+        display: flex; padding: 15px; background: var(--main-bg);
+        align-items: center; border-bottom: 1px solid #333;
+    }
+    .main-container { margin-left: 0; }
+}
+.hamburger { font-size: 28px; cursor: pointer; background: none; border: none; color: white; }
+.content-area { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; }
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 999; }
+.overlay.active { display: block; }
+</style>
+</head>
+<body>
+<div class="overlay" id="overlay"></div>
+<header class="top-nav-mobile">
+    <button class="hamburger" id="openMenu">☰</button>
+    <span style="margin-left: 15px; font-weight: bold;">Gemini App</span>
+</header>
+<aside class="navigation" id="sidebar">
+    <div class="sidebar-header" style="padding: 20px; font-weight: bold;">Gemini App</div>
+    <div class="nav-links">
+        <div class="nav-item">🏠 Home</div>
+        <div class="menu-wrapper">
+            <div class="nav-item" onclick="toggleSubMenu('newChatMenu', this)">
+                <span>💬 New Chat</span> <span class="arrow">▼</span>
+            </div>
+            <div id="newChatMenu" class="sub-menu">
+                <div class="sub-item">✨ Precise Mode</div>
+                <div class="sub-item">🎨 Creative Mode</div>
+            </div>
+        </div>
+        <div class="menu-wrapper">
+            <div class="nav-item" onclick="toggleSubMenu('historyMenu', this)">
+                <span>📚 History</span> <span class="arrow">▼</span>
+            </div>
+            <div id="historyMenu" class="sub-menu">
+                <div class="sub-item">📅 Last 7 Days</div>
+                <div class="sub-item">📁 Archived</div>
+            </div>
+        </div>
+        <div class="nav-item">⚙️ Settings</div>
+    </div>
+</aside>
+<script>
+const openMenu = document.getElementById('openMenu');
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+
+function toggleMenu() {
+    sidebar.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+openMenu.onclick = toggleMenu;
+overlay.onclick = toggleMenu;
+
+function toggleSubMenu(menuId, element) {
+    const menu = document.getElementById(menuId);
+    const arrow = element.querySelector('.arrow');
+    
+    // Toggle the specific menu
+    menu.classList.toggle('open');
+    arrow.classList.toggle('rotate');
+    
+    // Close other menus if open
+    document.querySelectorAll('.sub-menu').forEach(m => {
+        if(m.id !== menuId) m.classList.remove('open');
+    });
+}
+</script>
+</body>
+</html>
