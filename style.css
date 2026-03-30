@@ -1,0 +1,365 @@
+:root {
+            --bg-primary: #020617 !important;
+            --bg-secondary: #0f172a !important;
+            --accent: #00eaff !important;
+            --accent-glow: rgba(0, 234, 255, 0.3) !important;
+            --glass: rgba(255, 255, 255, 0.03) !important;
+            --glass-border: rgba(255, 255, 255, 0.1) !important;
+            --text-main: #f8fafc !important;
+        }
+        /* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-primary); 
+}
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, var(--accent), #0056b3);
+    border-radius: 10px;
+    border: 2px solid var(--bg-primary);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #fff;
+    box-shadow: 0 0 10px var(--accent);
+}
+        body {
+            background-color: var(--bg-primary) !important;
+            background-image:
+                radial-gradient(at 0% 0%, hsla(215, 98%, 61%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(185, 100%, 50%, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, hsla(220, 30%, 10%, 1) 0px, transparent 100%) !important;
+            background-attachment: fixed !important;
+            color: var(--text-main) !important;
+            font-family: 'Plus Jakarta Sans', sans-serif !important;
+            transition: background 0.3s !important;
+            overflow-x: hidden !important;
+            cursor: default !important;
+        }
+        /* NEW: Custom Cursor Glow */
+        #cursor-glow {
+            position: fixed !important;
+            width: 400px !important;
+            height: 400px !important;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%) !important;
+            border-radius: 50% !important;
+            pointer-events: none !important;
+            z-index: 9999 !important;
+            transform: translate(-50%, -50%) !important;
+            transition: width 0.3s, height 0.3s !important;
+            mix-blend-mode: screen !important;
+        }
+        canvas#particles {
+            position: fixed !important;
+            inset: 0 !important;
+            z-index: -1 !important;
+            opacity: 0.5 !important;
+        }
+        /* --- NAVIGATION --- */
+        .navbar {
+            backdrop-filter: blur(20px) !important;
+            background: rgba(2, 6, 23, 0.8) !important;
+            border-bottom: 1px solid var(--glass-border) !important;
+            padding: 15px 0 !important;
+        }
+        .navbar-brand {
+            letter-spacing: 2px !important;
+            font-size: 1.4rem !important;
+        }
+        /* --- HERO SECTION --- */
+        .hero {
+            min-height: 100vh !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            background: linear-gradient(to bottom, transparent, var(--bg-primary)) !important;
+        }
+        .hero-content h1 {
+            font-size: clamp(3rem, 10vw, 7.5rem) !important;
+            font-weight: 800 !important;
+            line-height: 0.9 !important;
+            margin-bottom: 20px !important;
+            background: linear-gradient(180deg, #fff 40%, var(--accent)) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            text-transform: uppercase !important;
+        }
+        /* --- PREMIUM GLASS CARDS --- */
+        .glass-card {
+            background: var(--glass) !important;
+            backdrop-filter: blur(15px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 28px !important;
+            padding: 2.5rem !important;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2) !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .glass-card:hover {
+            transform: translateY(-12px) !important;
+            border-color: var(--accent) !important;
+            box-shadow: 0 20px 40px rgba(0, 234, 255, 0.15) !important;
+            background: rgba(255, 255, 255, 0.06) !important;
+        }
+        /* --- IMAGE CONTAINERS --- */
+        .img-container {
+            position: relative !important;
+            overflow: hidden !important;
+            border-radius: 24px !important;
+            background: var(--bg-secondary) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+        }
+        .uniform-img {
+            width: 100% !important;
+            aspect-ratio: 3/4 !important;
+            object-fit: cover !important;
+            transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1) !important;
+        }
+        .img-container:hover .uniform-img {
+            transform: scale(1.1) rotate(1deg) !important;
+            filter: brightness(50%) !important;
+        }
+        .card-overlay {
+            position: absolute !important;
+            inset: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            padding: 25px !important;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent) !important;
+            opacity: 0 !important;
+            transition: 0.4s !important;
+        }
+        .img-container:hover .card-overlay {
+            opacity: 1 !important;
+        }
+        /* --- PROGRESS BAR --- */
+        #progress-bar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 3px !important;
+            background: linear-gradient(to right, var(--accent), #fff) !important;
+            width: 0% !important;
+            z-index: 10001 !important;
+            box-shadow: 0 0 10px var(--accent) !important;
+        }
+        /* --- BUTTONS --- */
+        .btn-action {
+            background: var(--accent) !important;
+            color: #020617 !important;
+            border: none !important;
+            padding: 12px 30px !important;
+            border-radius: 100px !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+            transition: 0.3s !important;
+        }
+        .btn-action:hover {
+            transform: scale(1.05) !important;
+            box-shadow: 0 0 20px var(--accent-glow) !important;
+            background: #fff !important;
+        }
+        /* NEW: Social Sidebar */
+        .social-sidebar {
+            position: fixed !important;
+            right: 20px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 15px !important;
+            z-index: 1000 !important;
+        }
+        .social-sidebar a {
+            width: 45px !important;
+            height: 45px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: var(--glass) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 50% !important;
+            color: white !important;
+            text-decoration: none !important;
+            transition: 0.3s !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        .social-sidebar a:hover {
+            background: var(--accent) !important;
+            color: #000 !important;
+            transform: translateX(-5px) !important;
+        }
+        /* NEW: Quote Section */
+        .quote-box {
+            border-left: 4px solid var(--accent) !important;
+            padding-left: 20px !important;
+            margin: 40px 0 !important;
+        }
+        /* --- MODALS --- */
+        .modal-content {
+            background: rgba(10, 15, 30, 0.95) !important;
+            backdrop-filter: blur(20px) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 35px !important;
+        }
+        .modal-banner {
+            height: 250px !important;
+            object-fit: cover !important;
+            border-radius: 35px 35px 0 0 !important;
+        }
+        .video-container {
+            position: relative !important;
+            padding-bottom: 56.25% !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            border-radius: 15px !important;
+            margin-top: 15px !important;
+        }
+        .video-container iframe {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+        }
+        @media(max-width:768px) {
+            canvas#particles {
+                display: none !important;
+            }
+            .hero-content h1 {
+                font-size: 3.5rem !important;
+            }
+            .social-sidebar {
+                display: none !important;
+            }
+        }
+        /* New Custom Classes for the Performance Grid */
+        .performance-card {
+            position: relative !important;
+            overflow: hidden !important;
+            cursor: pointer !important;
+            border-radius: 6px !important;
+            background-color: #1a1a1a !important;
+            /* Matches the wide landscape look of your reference image */
+            aspect-ratio: 16 / 9 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+        }
+        .performance-img {
+            width: 100% !important;
+            height: 100% !important;
+            /* 'cover' ensures the image fills the wide box perfectly like your sample */
+            object-fit: cover !important;
+            object-position: center !important;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1) !important;
+        }
+        .performance-card:hover .performance-img {
+            transform: scale(1.1) !important;
+        }
+        /* Updated Overlay to match the clean look */
+        .performance-overlay {
+            position: absolute !important;
+            inset: 0 !important;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.2) 60%, transparent 100%) !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            padding: 15px !important;
+            opacity: 0 !important;
+            transition: opacity 0.4s ease !important;
+        }
+        .performance-card:hover .performance-overlay {
+            opacity: 1 !important;
+        }
+        .performance-title {
+            font-size: 1.1rem !important;
+            letter-spacing: 0.5px !important;
+            text-transform: uppercase !important;
+        }
+        /* --- IMAGE CONTAINERS --- */
+        .img-container {
+            position: relative !important;
+            overflow: hidden !important;
+            border-radius: 24px !important;
+            background: var(--bg-secondary) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+        }
+        .uniform-img {
+            width: 100% !important;
+            aspect-ratio: 3/4 !important;
+            object-fit: cover !important;
+            transition: 0.8s cubic-bezier(0.2, 1, 0.3, 1) !important;
+        }
+        .img-container:hover .uniform-img {
+            transform: scale(1.1) rotate(1deg) !important;
+            filter: brightness(50%) !important;
+        }
+        .card-overlay {
+            position: absolute !important;
+            inset: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: flex-end !important;
+            padding: 25px !important;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent) !important;
+            opacity: 0 !important;
+            transition: 0.4s !important;
+        }
+        .img-container:hover .card-overlay {
+            opacity: 1 !important;
+        }
+        .video-wrapper {
+            position: relative !important;
+            width: 100% !important;
+            padding-top: 125% !important;
+            overflow: hidden !important;
+            border-radius: 12px !important;
+            background-color: #000 !important;
+        }
+        .uniform-video {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            pointer-events: none !important;
+        }
+        .video-gallery-item {
+            text-decoration: none !important;
+            display: block !important;
+            transition: none  !important;
+            transform: none  !important;
+        }
+        .video-gallery-item:hover {
+            opacity: 1 !important;
+        }
+        #backToTop {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99;
+    border: none;
+    outline: none;
+    background-color: var(--accent);
+    color: black;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 50%;
+    font-size: 18px;
+    box-shadow: 0 0 15px var(--accent-glow);
+    transition: 0.3s;
+}
+#backToTop:hover {
+    background-color: white;
+    transform: scale(1.1);
+}
